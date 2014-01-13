@@ -7,12 +7,45 @@ var CLOSE = CLOSE || ( function( $ ) {
     var _ = {};
 
     _.init = function() {
-        Parse.initialize("ENUHvNHQuOMhwYxGiZPi6c3AVORDKhfxnR1SvnY5", "1cogFRDdTx1yH1x73irClLWNPRduSAdpNJY1KIsY");
+        Parse.initialize("ENUHvNHQuOMhwYxGiZPi6c3AVORDKhfxnR1SvnY5", "1cogFRDdTx1yH1x73irClLWNPRduSAdpNJY1KIsY")
         CLOSE.getLocation();
+        CLOSE.ui.initUser();
+        CLOSE.ui.initSidebar();
+        CLOSE.ui.initLogin();
     };
 
-    var locationInProgress = false;
+    _.initMapPage = function( coords ) {
 
+        CLOSE.map.initMap({
+            divId: '#gmap',
+            currentLocation: coords
+        });
+
+        $('#ticket-search').on('submit', function( e ) {
+            e.preventDefault();
+            CLOSE.ui.loadListings( this, {
+                divId: '#sidebar-listing',
+                map: true
+            } );
+        });
+
+        $('#clear-filter').on('click', function() {
+
+            $(this).parent().find('input').val('');
+
+            CLOSE.ui.loadListings( null, {
+                divId: '#sidebar-listing'
+            });
+
+        });
+
+        $('#ticket-search').submit();
+
+
+    };
+
+
+    var locationInProgress = false;
     _.getLocation = function() {
 
         if ( !CLOSE.location && locationInProgress == false ) {
@@ -31,7 +64,7 @@ var CLOSE = CLOSE || ( function( $ ) {
 
                     CLOSE.location = coords;
 
-                    console.log( CLOSE.location );
+                    CLOSE.initMapPage( coords );
 
                 });
 

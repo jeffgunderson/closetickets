@@ -50,6 +50,9 @@ if ( 'development' == app.get('env') ) {
 app.get( '/', routes.homepage );
 app.get( '/home', routes.home );
 
+/** for FB **/
+app.get( '/fb-channel', routes.fbChannel );
+
 
 // Finally create the server listing to the environment port
 // Set to 3000 for now

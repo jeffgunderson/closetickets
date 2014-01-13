@@ -19,3 +19,13 @@ exports.home = function( req, res ) {
     render.renderHome( res, null );
 
 }
+
+
+
+
+
+exports.fbChannel = function( res ) {
+
+    render.renderFbChannel( res );
+
+}

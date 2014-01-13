@@ -3,6 +3,21 @@ CLOSE.data = CLOSE.data || ( function( $ ) {
     var _ = {};
 
     /**
+     * Normalizing parse result data function
+     * converts an anonymous array to an array wrapped with 'results'
+     * @data is required
+     * returns the data object
+     */
+    _.normalizeResults = function( data ) {
+
+        var newData = {};
+        newData.results = data;
+
+        return newData;
+
+    };
+
+    /**
      * Form to array function
      * converts a forms data to an array for easier handling
      * @$form is required
@@ -70,6 +85,103 @@ CLOSE.data = CLOSE.data || ( function( $ ) {
         }
 
     };
+
+
+
+    _.getTemplate = function( template ) {
+
+        var deferred = new $.Deferred();
+
+        $.ajax({
+            url: '/templates/' + template + '.html'
+        })
+        .done(function( template ) {
+            deferred.resolve( template );
+        });
+
+        return deferred;
+
+    }
+
+
+
+
+    _.locationUtil = function( listings ) {
+
+        for ( var i = 0; i < listings.results.length; i++ ) {
+
+            var listing = listings.results[i],
+                from = new google.maps.LatLng(listings.results[i].attributes.location.latitude, listings.results[i].attributes.location.longitude),
+                to   = new google.maps.LatLng(CLOSE.location.latitude, CLOSE.location.longitude),
+                distance = google.maps.geometry.spherical.computeDistanceBetween(from, to);
+
+            console.log(distance);
+
+            var mile = 5280,
+                distanceText;
+
+            if ( distance < 1000 ) {
+
+                if ( distance == 0 ) {
+                    distanceText = distance + ' feet';
+                }
+                else{
+                    distanceText = Math.round( distance + ' feet');
+                }
+
+            }
+            else if ( distance > mile && distance < mile + ( mile * 0.1 ) ) {
+                distanceText = Math.round( distance + ' mile');
+            }
+            else {
+                distanceText = Math.round( ( distance / mile ) * 10 ) / 10 + ' miles';
+            }
+
+            listing.attributes.locationDistanceFromText = distanceText;
+
+        }
+
+        return listings;
+
+    };
+
+
+
+
+    _.createListingQuery = function( thisData ) {
+
+        var $form = $( thisData ),
+            fields = CLOSE.data.formToArray( $form ),
+            listing = Parse.Object.extend( 'Listings' ),
+            query = new Parse.Query( listing );
+
+        query.descending('updatedAt');
+
+        //TODO: need to create a parse field that holds all searchable text
+
+        if ( fields.search ) {
+
+            query.contains('searchableText', fields.search.toLowerCase() );
+
+        }
+
+        if ( fields.dateFrom ) {
+
+            query.greaterThan('updatedAt', new Date( fields.dateFrom ) );
+
+        }
+
+        if ( fields.dateTo ) {
+
+            query.lessThan('updatedAt', new Date( fields.dateTo ) );
+
+        }
+
+        return query;
+
+    };
+
+
 
     return _;
 

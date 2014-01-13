@@ -10,33 +10,35 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
 
     _.createNewFbUser = function() {
 
+        Parse.FacebookUtils.init();
+
         Parse.FacebookUtils.logIn("user_likes,email", {
             success: function(user) {
                 // Handle successful login
                 console.log(user);
+
+                var deferred = new $.Deferred();
 
                 $.ajax({
                     url: 'https://graph.facebook.com/' + user.attributes.authData.facebook.id,
                     async: true
                 }).done(function(userInfo) {
 
-//                        var newUser = MOTO.parse.userData();
+                        var newUser = CLOSE.parse.userData();
 
                         newUser.set('name',userInfo.name);
                         newUser.set('profileimage','https://graph.facebook.com/' + user.attributes.authData.facebook.id + '/picture');
                         newUser.set('email',userInfo.email);
 
                         newUser.save(null, {
-                            success: function(user) {
+                            success: function( user ) {
 
-                                // successfully created the account so do this
-//                                CLOSE.ui.modalHide('welcome-signup');
-//                                CLOSE.ui.modalShow('welcome-start');
-//
-//                                CLOSE.ui.initProfilePreview('profile-menu','profile-menu','profile-preview');
+                                deferred.resolve;
 
                             },
                             error: function(user, error) {
+
+                                deferred.reject;
 
                             }
 
@@ -97,11 +99,11 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
      * pass in fields object
      * @$element is for error handling
      */
-    _.loginUser = function( $element, fields ) {
+    _.loginUser = function( fields ) {
 
         var deferred = new $.Deferred();
 
-        Parse.User.logIn( fields['0'].value , fields['1'].value , {
+        Parse.User.logIn( fields.email , fields.password , {
             success: function(user) {
 
                 deferred.resolve( user );
@@ -183,7 +185,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
      */
     _.userData = function() {
 
-        var user = MOTO.parse.currentUser();
+        var user = CLOSE.parse.currentUser();
 
         // wrap in results
         var userData = {};
@@ -191,6 +193,36 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
 
         return userData;
     };
+
+
+    /**
+     * Query Listings function
+     * @query object is required
+     * query help: https://parse.com/docs/js_guide#queries-basic
+     */
+    _.queryListings = function( query ) {
+
+        var deferred = new $.Deferred();
+
+        query.find({
+            success: function( listings ) {
+
+                var data = CLOSE.data.normalizeResults( listings );
+
+                deferred.resolve( data );
+
+            },
+            error: function( object, error ) {
+
+                deferred.resolve( object, error );
+
+            }
+        })
+
+        return deferred;
+
+    };
+
 
     /**
      * Query Posts function
@@ -204,12 +236,12 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
         query.find({
             success: function(posts) {
 
-                console.log("Successfully retrieved " + posts.length + " posts.");
+                CLOSE.log("Successfully retrieved " + posts.length + " posts.");
 
                 var data = {};
                 data.results = posts;
 
-                MOTO.data.convertDate( data );
+                CLOSE.data.convertDate( data );
 
                 deferred.resolve( data );
 
@@ -225,49 +257,38 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
 
     };
 
-    /**
-     * Upload image function
-     * Image data is passed in through... TODO: FIGURE OUT :)
-     */
-    _.uploadPhoto = function() {
 
-    };
 
-    /**
-     * Add Photo Post function
-     * @formdata is required
-     */
-    _.addPhoto = function( formData ) {
+
+    _.createListing = function( fields ) {
 
         var deferred = new $.Deferred();
 
-        var currentUser = MOTO.parse.currentUser();
-        var post = Parse.Object.extend('posts');
-        var photoPost = new post();
+        var Listings = Parse.Object.extend('Listings');
+        var listing = new Listings();
 
-        // if there is no image, then fail it
-        if ( !formData.url || formData.url == '' ) {
-            console.log('no image');
-            deferred.reject();
-            return false;
-        }
+        var userData = CLOSE.parse.userData();
 
-        // set some data for the post
-        photoPost.set( 'message', formData.message )
-            .set( 'url', formData.url )
-            .set( 'user', currentUser.id )
-            .set( 'name', currentUser.attributes.name )
-            .set( 'profileurl', currentUser.attributes.profileImage )
-            .set( 'type', 'photo' );
+        var location = new Parse.GeoPoint({latitude: CLOSE.location.latitude, longitude: CLOSE.location.longitude });
 
-        // save the photo
-        photoPost.save(null, {
-            success:function( returnData ) {
+        CLOSE.log( fields.date );
 
-                deferred.resolve( returnData );
+        listing.set('listingTitle', fields.name );
+        listing.set('listingDescription', fields.description );
+        listing.set('listingDate', new Date( fields.date ));
+        listing.set('price', parseFloat( fields.price ) );
+        listing.set('userId', userData.id );
+        listing.set('searchableText', fields.name.toLowerCase() + fields.description.toLowerCase() );
+        listing.set('location', CLOSE.location );
+        listing.set('locationGeoPoint', location );
+
+        listing.save( null, {
+            success: function( listingItem ) {
+
+                deferred.resolve( listingItem );
 
             },
-            error: function( error ) {
+            error: function(listingItem, error) {
 
                 deferred.reject( error );
 
@@ -277,6 +298,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
         return deferred;
 
     };
+
 
 
 

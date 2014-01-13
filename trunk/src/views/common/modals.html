@@ -5,11 +5,14 @@
         <h3 id="myModalLabel"><i class="icon">&#128275;</i> Sign Up Today</h3>
     </div>
     <div class="modal-body">
-       <div style="padding:30px;">
-            <input type="text" name="fullname" placeholder="Full Name" class="input-block">
-            <input type="text" name="email" placeholder="Email" class="input-block">
-            <input type="password" name="password" placeholder="Password" class="input-block">
-            <br>
+
+       <div style="padding:15px 30px;">
+           <input type="text" name="fullname" placeholder="Full Name" class="input-block">
+           <input type="text" name="email" placeholder="Email" class="input-block">
+           <input type="password" name="password" placeholder="Password" class="input-block">
+           <!--<a class="button button-block button-blue" onclick="CLOSE.ui.createFbUser()"><i class="icon-social">&#62221;</i> Signup with Facebook</a>-->
+           <!--<br>-->
+           <!--<span class="social-disclaimer"><i class="icon">&#59141;</i> We require a facebook login to help add a level of security to our users so they know better who they are deaing with. We promise to never use your information in any way blah blah blah ;-)</span>-->
        </div>
     </div>
     <div class="modal-footer">
@@ -17,4 +20,61 @@
         <button type="submit" class="button button-medium button-green"><i class="icon">&#128273;</i> Create Account</button>
     </div>
     </form>
+</div>
+
+
+<!-- sign up and login -->
+<div id="loginModal" class="modal hide fade">
+    <form id="createAccount" action="login">
+        <div class="modal-header modal-header-green clearfix">
+            <h3 id="myModalLabel"><i class="icon">&#128275;</i> Login</h3>
+        </div>
+        <div class="modal-body">
+
+            <div style="padding:15px 30px;">
+                <input type="text" name="email" placeholder="Email" class="input-block">
+                <input type="password" name="password" placeholder="Password" class="input-block">
+                <!--<a class="button button-block button-blue" onclick="CLOSE.ui.createFbUser()"><i class="icon-social">&#62221;</i> Signup with Facebook</a>-->
+                <!--<br>-->
+                <!--<span class="social-disclaimer"><i class="icon">&#59141;</i> We require a facebook login to help add a level of security to our users so they know better who they are deaing with. We promise to never use your information in any way blah blah blah ;-)</span>-->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="button button-medium" data-dismiss="modal" aria-hidden="true"><i class="icon">&#10060;</i> Cancel</button>
+            <button type="submit" class="button button-medium button-green"><i class="icon">&#128273;</i> Login</button>
+        </div>
+    </form>
+</div>
+
+<!-- create ticket modal -->
+<div id="createListingModal" class="modal hide fade">
+
+    <form id="createListing" onsubmit="CLOSE.ui.createListing(this, null)">
+
+        <div class="modal-header modal-header-gray clearfix">
+            <h3><i class="icon">&#9998;</i> Create your Ticket Listing</h3>
+        </div>
+
+        <div class="modal-body">
+            <p>Fill out the following information to create your listing. It doesn't cost you a penny.</p>
+            <div class="input-group">
+                <input type="text" name="name" placeholder="Event Name">
+            </div>
+            <div class="input-group">
+                <span class="input-cap-left">$</span> <input type="text" name="price" placeholder="price" class="input-small">
+                <span class="input-cap-left"><i class="icon">&#128197;</i></span> <input type="text" name="date" placeholder="01/04/14" data-date-format="mm/dd/yy" class="input-date input-small">
+            </div>
+
+            <textarea name="description" rows="5" placeholder="Event Description"></textarea>
+            <!--<br>-->
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="button button-medium" data-dismiss="modal" aria-hidden="true"><i class="icon">&#10060;</i> Cancel</button>
+            <button class="button button-green button-medium"><i class="icon">&#128077;</i> Create Listing</button>
+        </div>
+
+    </form>
+
 </div>

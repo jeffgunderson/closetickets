@@ -1,14 +1,18 @@
 <header class="header">
-    <div class="inner">
-        <img style="width:40px" src="/img/logo-shape.png">
+    <ul class="navigation float-left">
+        <li><a class="nav-item logged-in" data-toggle="sidebar"><i class="icon icon-large">&#9776;</i></a></li>
+    </ul>
+    <div class="logo">
         <span class="company-name">Closetickets</span>
-        <!--<img style="width:160px" src="/img/logo.png">-->
-        <ul class="navigation float-right">
-            <li><a href="#">About</a></li>
-            <li><a href="#">Psychobiotics</a></li>
-            <li><a href="#">Reviews</a></li>
-            <li><a href="#">Articles</a></li>
-            <li><a class="init-signup" href="#signupModal" data-toggle="modal">Sign Up</a></li>
-        </ul>
     </div>
+    <ul class="navigation float-right">
+        <!--<li><a class="nav-item"></a></li>-->
+        <li><a class="nav-item not-logged-in" style="display:none" data-target="#signupModal" data-toggle="modal">Sign Up</a></li>
+        <li><a class="nav-item not-logged-in" style="display:none" data-target="#loginModal" data-toggle="modal">Log In</a></li>
+        <li><a class="nav-item" data-toggle="modal" data-target="#createListingModal"><i class="icon">&#127915;</i> Sell a Ticket</a></li>
+        <!--<li><a class="button button-medium button-green" data-toggle="modal" data-target="#createListingModal"><i class="icon">&#59172;</i> Sell Yours</a></li>-->
+        <!--<li class="not-logged-in" style="display:none;"><a class="init-signup bubble" data-target="#loginModal" data-toggle="modal">Login</a></li>-->
+        <!--<li class="not-logged-in" style="display:none;"><a class="init-signup bubble" data-target="#signupModal" data-toggle="modal">Sign Up</a></li>-->
+        <!--<li class="logged-in" style="display:none;"><a class="init-signup"></a></li>-->
+    </ul>
 </header>

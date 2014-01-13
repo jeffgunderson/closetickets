@@ -1,8 +1,16 @@
-var commonPartials = {
+var commonPartialsHomepage = {
     'header': 'common/header-home',
     'footer': 'common/footer',
     'tracking':'common/tracking',
-    'modals' : 'common/modals'
+    'modals' : 'common/modals',
+    'side-menu' : 'common/side-menu'
+}
+var commonPartials = {
+    'header': 'common/header',
+    'footer': 'common/footer',
+    'tracking':'common/tracking',
+    'modals' : 'common/modals',
+    'side-menu' : 'common/side-menu'
 }
 
 /*
@@ -22,7 +30,7 @@ exports.renderHomepage = function( res, data ) {
                 title: 'Close Tickets',
                 description: 'This is the page description'
             },
-            partials: commonPartials
+            partials: commonPartialsHomepage
         }
     );
 
@@ -49,3 +57,18 @@ exports.renderHome = function( res, data ) {
     );
 
 };
+
+
+
+
+
+exports.renderFbChannel = function( res ) {
+
+    var cacheExpire = 60*60*24*365;
+
+    res.header('Pragma','public');
+    res.header('Cache-Control','max-age=' + cacheExpire );
+    res.header('Expires', new Date + cacheExpire );
+//    res.end('<script src="//connect.facebook.net/en_US/all.js"></script>');
+
+}
