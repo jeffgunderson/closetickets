@@ -1,3 +1,5 @@
+// TODO: Probably DELETE this file
+
 CLOSE.ui = ( function( $ ) {
 
     var _ = {};

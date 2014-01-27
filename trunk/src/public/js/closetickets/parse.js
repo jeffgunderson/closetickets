@@ -2,13 +2,10 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
 
     var _ = {};
 
-    _.init = function() {
-
-        Parse.initialize("fyvfNcsZtTWYwDqsdAvDwpvxKANR7TyaWaUFt0hz", "3OyBI4lgjRUOa7O3BSKRMBpX52ReROkuypwFvIoo");
-
-    };
-
+    // TODO: re-implement this ( should be working-ish but not exposed to user )
     _.createNewFbUser = function() {
+
+        var deferred = new $.Deferred();
 
         Parse.FacebookUtils.init();
 
@@ -16,8 +13,6 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
             success: function(user) {
                 // Handle successful login
                 console.log(user);
-
-                var deferred = new $.Deferred();
 
                 $.ajax({
                     url: 'https://graph.facebook.com/' + user.attributes.authData.facebook.id,
@@ -33,18 +28,16 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
                         newUser.save(null, {
                             success: function( user ) {
 
-                                deferred.resolve;
+                                deferred.resolve();
 
                             },
                             error: function(user, error) {
 
-                                deferred.reject;
+                                deferred.reject();
 
                             }
 
                         });
-
-
 
                     });
 
@@ -53,6 +46,8 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
                 // Handle errors and cancellation
             }
         });
+
+        return deferred;
 
     };
 
@@ -207,7 +202,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
         query.find({
             success: function( listings ) {
 
-                var data = CLOSE.data.normalizeResults( listings );
+                var data = CLOSE.util.normalizeResults( listings );
 
                 deferred.resolve( data );
 
@@ -217,7 +212,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
                 deferred.resolve( object, error );
 
             }
-        })
+        });
 
         return deferred;
 
@@ -241,7 +236,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
                 var data = {};
                 data.results = posts;
 
-                CLOSE.data.convertDate( data );
+                CLOSE.util.convertDate( data );
 
                 deferred.resolve( data );
 
@@ -258,21 +253,29 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
     };
 
 
-
-
+    /**
+     *
+     * @param fields
+     * fields are an array of fields from a listing form
+     * creates the listing with parse and returns the deferred object so done methods can be used
+     * @returns {$.Deferred}
+     */
     _.createListing = function( fields ) {
 
+        // create the deferred
         var deferred = new $.Deferred();
 
+        // access the listing class and create a listing object to be saved
         var Listings = Parse.Object.extend('Listings');
         var listing = new Listings();
 
+        // get some user data from the current user
         var userData = CLOSE.parse.userData();
 
+        // get the location of the current user
         var location = new Parse.GeoPoint({latitude: CLOSE.location.latitude, longitude: CLOSE.location.longitude });
 
-        CLOSE.log( fields.date );
-
+        // set all the fields for the listing
         listing.set('listingTitle', fields.name );
         listing.set('listingDescription', fields.description );
         listing.set('listingDate', new Date( fields.date ));
@@ -282,14 +285,17 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
         listing.set('location', CLOSE.location );
         listing.set('locationGeoPoint', location );
 
+        // save that shiz
         listing.save( null, {
             success: function( listingItem ) {
 
+                // return a successful handler
                 deferred.resolve( listingItem );
 
             },
             error: function(listingItem, error) {
 
+                // return a failed handler with the error
                 deferred.reject( error );
 
             }
@@ -300,6 +306,50 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
     };
 
 
+
+    /**
+     *
+     * @param thisData is a form object
+     * function creates a parse query for ticket listings to query the DB
+     * query help: https://parse.com/docs/js_guide#queries-basic
+     * @returns {Parse.Query}
+     */
+    _.createListingQuery = function( thisData ) {
+
+        // turn $form into jQuery object, run it through our form to array util and create the query
+        var $form = $( thisData ),
+            fields = CLOSE.util.formToArray( $form ),
+            listing = Parse.Object.extend( 'Listings' ),
+            query = new Parse.Query( listing );
+
+        // formate the query by updated date
+        query.descending('updatedAt');
+
+        // if the form contains a search field
+        if ( fields.search ) {
+
+            query.contains('searchableText', fields.search.toLowerCase() );
+
+        }
+
+        // if we are looking for a beginning date
+        if ( fields.dateFrom ) {
+
+            query.greaterThan('updatedAt', new Date( fields.dateFrom ) );
+
+        }
+
+        // if we are looking at a end date
+        if ( fields.dateTo ) {
+
+            query.lessThan('updatedAt', new Date( fields.dateTo ) );
+
+        }
+
+        // return the query
+        return query;
+
+    };
 
 
     return _;

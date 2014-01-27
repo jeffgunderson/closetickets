@@ -2,20 +2,30 @@ CLOSE.ui = ( function( $ ) {
 
     var _ = {};
 
+    /**
+     * Creating a user from form fields
+     * @thisData object is required (from a form submit)
+     */
     _.createUser = function( thisData ) {
 
         event.preventDefault();
 
         var $form = $( thisData );
 
-        var fields = CLOSE.data.formToArray( $form );
+        var fields = CLOSE.util.formToArray( $form );
 
-        console.log( fields );
-
-        CLOSE.parse.createNewUser( fields );
-
+        CLOSE.parse.createNewUser( fields )
+            .done( function( user ) {
+                //TODO: do something
+            })
+            .fail( function( user, error ) {
+                //TODO: do something with the error
+            });
     };
 
+    /**
+     * Inits the login bindings
+     */
     _.initLogin = function() {
 
         $('form[action="login"]').on('submit',function( event ) {
@@ -24,7 +34,7 @@ CLOSE.ui = ( function( $ ) {
 
             var $form = $( this );
 
-            var fields = CLOSE.data.formToArray( $form );
+            var fields = CLOSE.util.formToArray( $form );
 
             CLOSE.parse.loginUser( fields ).done(function() {
 
@@ -42,9 +52,12 @@ CLOSE.ui = ( function( $ ) {
 
 
 
-    }
+    };
 
-
+    /**
+     * UI side of creating an FB user
+     * TODO: do something after creating the user
+     */
     _.createFbUser = function() {
 
         CLOSE.parse.createNewFbUser().done(function() {
@@ -54,21 +67,22 @@ CLOSE.ui = ( function( $ ) {
     };
 
 
+
+
     /**
      * Query Listings function
      * @query object is required
-     * query help: https://parse.com/docs/js_guide#queries-basic
      */
     _.loadListings = function( thisData, options ) {
 
-        var query = CLOSE.data.createListingQuery( thisData );
+        var query = CLOSE.parse.createListingQuery( thisData );
 
         CLOSE.parse.queryListings( query ).done(function( listings ) {
 
-            CLOSE.data.getTemplate( 'sidebar-listing' ).done( function( template ) {
+            CLOSE.util.getTemplate( 'sidebar-listing' ).done( function( template ) {
 
-                // add some needed location info
-                var newListings = CLOSE.data.locationUtil( listings );
+                // add some needed location info ( miles away, etc )
+                var newListings = CLOSE.util.locationUtil( listings );
 
                 var html = Mustache.render( template, newListings );
 
@@ -91,14 +105,21 @@ CLOSE.ui = ( function( $ ) {
 
     };
 
-    _.createListing = function( thisData, options ) {
+
+    /**
+     *
+     * @param thisData is from a form submit
+     * Sends the form data to create a listing with parse and returns the object so we can do some UI stuff
+     */
+    _.createListing = function( thisData ) {
 
         event.preventDefault();
 
-        var fields = CLOSE.data.formToArray( $(thisData ) );
+        var fields = CLOSE.util.formToArray( $(thisData ) );
 
         CLOSE.parse.createListing( fields ).done(function( listing ) {
 
+            // TODO: Do something here with the UI after we create a listing
             console.log( 'created listing' );
             console.log( listing );
 
@@ -107,6 +128,9 @@ CLOSE.ui = ( function( $ ) {
     };
 
 
+    /**
+     * Just a simple function to show whether a user is logged in or not
+     */
     _.initUser = function() {
 
         var user = CLOSE.parse.currentUser();
@@ -118,6 +142,7 @@ CLOSE.ui = ( function( $ ) {
             $('.logged-in.username').html( user.attributes.name );
 
         }
+
         else{
 
             $('.not-logged-in').show();
@@ -127,22 +152,35 @@ CLOSE.ui = ( function( $ ) {
 
     };
 
+
+    /**
+     * Initializes the off canvas menu
+     * TODO: rename to off canvus or something that makes more sense
+     */
     _.initSidebar = function() {
 
         var $body = $('body');
-        // first need to create the empty div that is needed
-        $body.append('<a data-toggle="sidebar" id="page-cover" style="display:none"></a>');
 
-        $('a[data-toggle="sidebar"]').on('click', function() {
+        // first need to create the empty div that is needed to cover the other half of the screen
+        // only do this once so we don't have duplicates so check to see if it exists first
+        if ( !$('#page-cover').length ) {
+            $body.append('<a data-toggle="sidebar" id="page-cover" style="display:none"></a>');
+        }
+
+        // bind the click events
+        $('a[data-toggle="sidebar"]').on( 'click', function() {
 
             var activeClass = 'active',
                 sidebarWidth = 300,
                 $cover = $('#page-cover');
 
+            // set some CSS on the body so it can be moved
             $body.css({ position: 'relative' });
 
+            // check to make sure the menu isn't already exposed
             if ( !$body.hasClass(activeClass) ) {
 
+                // show the cover and add some CSS to it
                 $cover.show().css({
                     display: 'block',
                     position: 'fixed',
@@ -153,22 +191,28 @@ CLOSE.ui = ( function( $ ) {
                     bottom:0
                 });
 
+                // animate the body to expose the menu
                 $body.animate({
                     left: sidebarWidth
                 }, 100 );
 
+                // add the active class so we know that it's open
                 $body.addClass(activeClass);
 
             }
 
+            // if it's already open we need to close it
             else{
 
+                // hide the cover
                 $cover.hide();
 
+                // animate the body back to normal position
                 $body.animate({
                     left: 0
                 }, 100 );
 
+                // remove the active class so we know it's closed
                 $body.removeClass(activeClass);
 
             }
@@ -177,6 +221,25 @@ CLOSE.ui = ( function( $ ) {
 
 
     };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
