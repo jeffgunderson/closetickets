@@ -212,6 +212,9 @@ a{
     line-height:50px;
     padding:0 15px;
 }
+.header .logo img{
+    width:40px;
+}
 .header a{
     color:#777;
 }
@@ -455,7 +458,7 @@ a{
     color:#aaa;
     font-size:13px;
     position:absolute;
-    top:10px;
+    top:7px;
     right:10px;
 }
 .sidebar .listing .user{
@@ -566,6 +569,13 @@ textarea{
 /*------------------------------------------------------------
                     PIN
 -------------------------------------------------------------*/
+.gm-style div, .gm-style span, .gm-style label, .gm-style a{
+    font-family: 'Proxima Nova', 'Proxima Nova Web', 'helvetica neue', helvetica, arial, sans-serif !important;
+    font-weight:auto !important;
+}
+/*.gm-style .gm-style-iw, .gm-style .gm-style-iw a, .gm-style .gm-style-iw span, .gm-style .gm-style-iw label, .gm-style .gm-style-iw div {*/
+    /*font-weight:normal !important;*/
+/*}*/
 .pin-wrapper{
     padding:15px;
     width:300px;
@@ -574,8 +584,12 @@ textarea{
 }
 .pin-wrapper div.name{
     font-size:16px;
-    font-weight:bold;
     font-family: 'Proxima Nova', 'Proxima Nova Web', 'helvetica neue', helvetica, arial, sans-serif;
+    font-weight:bold;
+}
+.pin-wrapper a.button{
+    font-size:16px;
+    font-weight:normal;
 }
 
 
@@ -586,8 +600,21 @@ textarea{
 .button-area{
     padding:40px 0;
 }
-.button-group .button{
+.button-area .button{
     margin:0 5px 3px;
+    padding: 8px 14px;
+}
+.button-group{
+    font-size:0 !important;
+}
+.button-group .button{
+    margin-left:-1px;
+}
+.button-group .button:first-child{
+    border-radius:4px 0 0 4px;
+}
+.button-group .button:last-child{
+    border-radius:0 4px 4px 0;
 }
 .button{
     cursor:pointer;
@@ -623,6 +650,7 @@ textarea{
     outline:0;
 }
 .button:active{
+    background:rgba(0,0,0,0.05);
     box-shadow:inset 0 1px 4px rgba(0,0,0,0.3);
     outline:0;
     transition: all .05s;
@@ -663,6 +691,9 @@ textarea{
 .button-pink:hover{
     background: #FD119D;
 }
+.button-pink:active{
+    background: #DB007B;
+}
 .button-green{
     background: #4AD150;
     border: 1px solid #5DAB9D;
@@ -672,6 +703,9 @@ textarea{
 .button-green:hover{
     background: #5BE261;
 }
+.button-active:active{
+    background: #39C040;
+}
 .button-blue{
     background:#33bdfc;
     border:1px solid #22acdb;
@@ -680,6 +714,9 @@ textarea{
 }
 .button-blue:hover{
     background:#44cefe;
+}
+.button-blue:active{
+    background: #22aceb;
 }
 
 
