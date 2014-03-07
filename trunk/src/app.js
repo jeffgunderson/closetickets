@@ -51,6 +51,7 @@ app.get( '/', routes.homepage );
 app.get( '/home', routes.home );
 
 /** for FB **/
+// TODO: finish page
 app.get( '/fb-channel', routes.fbChannel );
 
 

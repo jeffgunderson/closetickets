@@ -10,9 +10,8 @@ CLOSE.ui = ( function( $ ) {
 
         event.preventDefault();
 
-        var $form = $( thisData );
-
-        var fields = CLOSE.util.formToArray( $form );
+        var $form = $( thisData ),
+            fields = CLOSE.util.formToArray( $form );
 
         CLOSE.parse.createNewUser( fields )
             .done( function( user ) {
@@ -32,9 +31,8 @@ CLOSE.ui = ( function( $ ) {
 
             event.preventDefault();
 
-            var $form = $( this );
-
-            var fields = CLOSE.util.formToArray( $form );
+            var $form = $( this ),
+                fields = CLOSE.util.formToArray( $form );
 
             CLOSE.parse.loginUser( fields ).done(function() {
 
@@ -153,9 +151,38 @@ CLOSE.ui = ( function( $ ) {
     };
 
 
+
+    /**
+     * Initializes the hide/show tabs for main UI search vs create
+     * options:
+     * - buttonClass (related to elements that trigger tab changes)
+     * - tabClass (related to the elements that change when trigger is acted on)
+     */
+    _.initTabs = function( options ) {
+
+        $('.' + options.buttonClass ).on( 'click', function() {
+
+            var $this = $(this),
+                $these = $('.' + options.buttonClass ),
+                targetId = $this.data('target'),
+                $thisTab = $('#' + targetId ),
+                $theseTabs = $('.' + options.tabClass ),
+                active = 'active';
+
+            $these.removeClass( active );
+            $this.addClass( active );
+            $theseTabs.hide();
+            $thisTab.show();
+
+        });
+
+    }
+
+
+
     /**
      * Initializes the off canvas menu
-     * TODO: rename to off canvus or something that makes more sense
+     * TODO: rename to off canvas or something that makes more sense
      */
     _.initSidebar = function() {
 
@@ -166,6 +193,15 @@ CLOSE.ui = ( function( $ ) {
         if ( !$('#page-cover').length ) {
             $body.append('<a data-toggle="sidebar" id="page-cover" style="display:none"></a>');
         }
+
+        // TODO: move??
+        var messagingFlag = false;
+        $('#messagesModal').on( 'show.bs.modal', function (e) {
+            if ( !messagingFlag ) {
+                CLOSE.messaging.initMessaging();
+                messagingFlag = true;
+            }
+        });
 
         // bind the click events
         $('a[data-toggle="sidebar"]').on( 'click', function() {

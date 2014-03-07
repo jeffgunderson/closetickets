@@ -18,10 +18,9 @@ var commonPartials = {
  * Render the homepage
  *
  */
-exports.renderHomepage = function( res, data ) {
+exports.renderHomepage = function( res ) {
 
     console.log( 'Starting to render the homepage');
-    console.log( data );
 
     res.render('homepage',
         {
@@ -42,7 +41,7 @@ exports.renderHomepage = function( res, data ) {
  * Render the home screen
  *
  */
-exports.renderHome = function( res, data ) {
+exports.renderHome = function( res ) {
 
     console.log('Starting to render home');
 
@@ -62,7 +61,10 @@ exports.renderHome = function( res, data ) {
 
 
 
+
 exports.renderFbChannel = function( res ) {
+
+    //TODO: Get this working
 
     var cacheExpire = 60*60*24*365;
 

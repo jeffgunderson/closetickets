@@ -5,21 +5,23 @@ var render = require('../custom_modules/render.js');
 /*
  * GET home page.
  */
-exports.homepage = function (req, res) {
+// ( res, body ) - Body is data from request response data
+exports.homepage = function ( req, res ) {
 
-    // ( res, body ) - Body is data from request response data
-    render.renderHomepage( res, null );
+
+    render.renderHomepage( res );
 
 };
 
 
-
+/*
+ * GET home(map page).
+ */
 exports.home = function( req, res ) {
 
-    render.renderHome( res, null );
+    render.renderHome( res );
 
-}
-
+};
 
 
 
@@ -28,4 +30,4 @@ exports.fbChannel = function( res ) {
 
     render.renderFbChannel( res );
 
-}
+};

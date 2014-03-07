@@ -11,29 +11,60 @@
 </style>
 
 <div class="sidebar">
-    <div class="sidebar-listing-query">
-        <div class="inner">
-            <form id="ticket-search">
-                <span><i class="icon">&#9881;</i> Ticket Filtering</span>
-                <div class="input-group">
-                    <input class="input-block" type="text" name="search" placeholder="Search...">
-                </div>
-                <div class="input-group">
-                    <input type="text" name="dateFrom" placeholder="02/16/12" data-date-format="mm/dd/yy" class="input-date input-small">
-                    <span> to </span>
-                    <input type="text" name="dateTo" placeholder="02/16/12" data-date-format="mm/dd/yy" class="input-date input-small">
-                </div>
-                <button class="button button-blue button-medium" type="submit"><i class="icon">&#128269;</i> Search</button>
-                <button class="button button-medium" id="clear-filter"><i class="icon">&#128260;</i> Reset</button>
-            </form>
+    <div class="sidebar-toggle clearfix">
+        <a data-target="search-listings" class="toggle-tab active">Search</a>
+        <a data-target="sell-listing" class="toggle-tab">Sell</a>
+    </div>
+    <div class="sidebar-toggle-tab" id="search-listings">
+        <div class="sidebar-listing-query">
+            <div class="inner">
+                <form id="ticket-search">
+                    <span><i class="icon-cog"></i> Ticket Filtering</span>
+                    <div class="input-group">
+                        <input class="input-block" type="text" name="search" placeholder="Search...">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" name="dateFrom" placeholder="02/16/12" data-date-format="mm/dd/yy" class="input-date input-small">
+                        <span> to </span>
+                        <input type="text" name="dateTo" placeholder="02/16/12" data-date-format="mm/dd/yy" class="input-date input-small">
+                    </div>
+                    <button class="button button-blue button-medium" type="submit"><i class="icon-search"></i> Search</button>
+                    <button class="button button-medium" id="clear-filter"><i class="icon-cycle"></i> Reset</button>
+                </form>
+            </div>
+        </div>
+        <ul id="sidebar-listing" class="sidebar-listing">
+
+            <!-- sidebar listings rendered here -->
+            <div class="loading-graphic"><i class="icon-cw rotate"></i> Loading...</div>
+
+        </ul>
+    </div>
+    <div class="sidebar-toggle-tab" id="sell-listing" style="display:none;">
+        <div class="sidebar-toggle-form">
+            <div class="inner">
+                <form id="createListing" onsubmit="CLOSE.ui.createListing( this )">
+
+                    <span><i class="icon-pencil"></i> Create your Ticket Listing</span>
+                        <p>Fill out the following information to create your listing. It doesn't cost you a penny.</p>
+                        <div class="input-group">
+                            <input type="text" name="name" placeholder="Event Name">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-cap-left"><i class="icon-dollar"></i></span> <input type="text" name="price" placeholder="price" class="input-small">
+                            <span class="input-cap-left"><i class="icon-calendar"></i></span> <input type="text" name="date" placeholder="01/04/14" data-date-format="mm/dd/yy" class="input-date input-small">
+                        </div>
+                        <textarea name="description" rows="5" placeholder="Event Description"></textarea>
+                        <br><br>
+                        <button class="button button-medium" data-dismiss="modal" aria-hidden="true"><i class="icon-cross"></i> Cancel</button>
+                        <button class="button button-blue button-medium"><i class="icon-location"></i> Drop Pin</button>
+
+                </form>
+            </div>
         </div>
     </div>
-    <ul id="sidebar-listing" class="sidebar-listing">
+    </div>
 
-        <!-- sidebar listings rendered here -->
-        <div class="loading-graphic"><i class="icon rotate">&#10227;</i> Loading...</div>
-
-    </ul>
 </div>
 
 <div id="gmap"></div>
@@ -43,6 +74,12 @@
 
 <script>
     $(function() {
+
+        CLOSE.ui.initTabs({
+            buttonClass: "toggle-tab",
+            tabClass: "sidebar-toggle-tab"
+        });
+
         $('.input-date').datepicker();
     })
 </script>

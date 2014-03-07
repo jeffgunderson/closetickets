@@ -22,35 +22,37 @@ var CLOSE = CLOSE || ( function( $ ) {
     _.initMapPage = function() {
 
         // get the location first
-        CLOSE.getLocation()
-            .done(function( coords ) {
+        if ( $('#gmap').length ) {
+            CLOSE.getLocation()
+                .done(function( coords ) {
 
-            CLOSE.map.initMap({
-                divId: '#gmap',
-                currentLocation: coords
-            });
-
-            $('#ticket-search').on( 'submit', function( e ) {
-                e.preventDefault();
-                CLOSE.ui.loadListings( this, {
-                    divId: '#sidebar-listing',
-                    map: true
-                } );
-            });
-
-            $('#clear-filter').on( 'click', function() {
-
-                $(this).parent().find('input').val('');
-
-                CLOSE.ui.loadListings( null, {
-                    divId: '#sidebar-listing'
+                CLOSE.map.initMap({
+                    divId: '#gmap',
+                    currentLocation: coords
                 });
 
+                $('#ticket-search').on( 'submit', function( e ) {
+                    e.preventDefault();
+                    CLOSE.ui.loadListings( this, {
+                        divId: '#sidebar-listing',
+                        map: true
+                    } );
+                });
+
+                $('#clear-filter').on( 'click', function() {
+
+                    $(this).parent().find('input').val('');
+
+                    CLOSE.ui.loadListings( null, {
+                        divId: '#sidebar-listing'
+                    });
+
+                });
+
+                $('#ticket-search').submit();
+
             });
-
-            $('#ticket-search').submit();
-
-        });
+        }
 
     };
 
@@ -59,8 +61,6 @@ var CLOSE = CLOSE || ( function( $ ) {
     /**
      * Uses HTML5 location to figure location
      * MOST accurate using phone/tablet with GPS, desktop/laptop not so accurate
-     * TODO: use deferred method
-     * TODO!!! TODO!!! TODO!!!: make sure new deferred method works ;-)
      */
 //    var locationInProgress = false;
     _.getLocation = function() {
