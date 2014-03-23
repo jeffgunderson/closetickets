@@ -1,19 +1,9 @@
-<style>
-    html, body {
-        width: 100%;
-        height: 100%;
-    }
-    #gmap{
-        width:100%;
-        height:100%;
-        position:absolute;
-    }
-</style>
+
 
 <div class="sidebar">
     <div class="sidebar-toggle clearfix">
-        <a data-target="search-listings" class="toggle-tab active">Search</a>
-        <a data-target="sell-listing" class="toggle-tab">Sell</a>
+        <a data-target="search-listings" class="toggle-tab active"><i class="icon-search"></i> Find</a>
+        <a data-target="sell-listing" class="toggle-tab"><i class="icon-ticket"></i> Sell</a>
     </div>
     <div class="sidebar-toggle-tab" id="search-listings">
         <div class="sidebar-listing-query">
@@ -43,7 +33,7 @@
     <div class="sidebar-toggle-tab" id="sell-listing" style="display:none;">
         <div class="sidebar-toggle-form">
             <div class="inner">
-                <form id="createListing" onsubmit="CLOSE.ui.createListing( this )">
+                <form class="create-listing-form" id="createListing">
 
                     <span><i class="icon-pencil"></i> Create your Ticket Listing</span>
                         <p>Fill out the following information to create your listing. It doesn't cost you a penny.</p>
@@ -56,8 +46,9 @@
                         </div>
                         <textarea name="description" rows="5" placeholder="Event Description"></textarea>
                         <br><br>
-                        <button class="button button-medium" data-dismiss="modal" aria-hidden="true"><i class="icon-cross"></i> Cancel</button>
-                        <button class="button button-blue button-medium"><i class="icon-location"></i> Drop Pin</button>
+                        <a class="button button-medium" data-dismiss="modal" aria-hidden="true"><i class="icon-cross"></i> Cancel</a>
+                        <button id="drop-pin" class="button button-blue button-medium"><i class="icon-location"></i> Drop Pin</button>
+                        <a id="confirm-position" style="display:none;" class="button button-medium button-green"><i class="icon-checkmark"></i> Confirm</a>
 
                 </form>
             </div>

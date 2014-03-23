@@ -42,6 +42,8 @@ CLOSE.ui = ( function( $ ) {
                     window.location = '/home';
                 }
 
+                $('#loginModal').modal('hide');
+
                 CLOSE.ui.initUser();
 
             });
@@ -104,22 +106,66 @@ CLOSE.ui = ( function( $ ) {
     };
 
 
+    _.initListingFiltering = function( params ) {
+
+        $( params.searchFormId ).on( 'submit', function( e ) {
+
+            e.preventDefault();
+
+            CLOSE.ui.loadListings( this, {
+                divId: params.sidebarDivId,
+                map: true
+            } );
+
+        }).submit();
+
+        $( params.clearDivId ).on( 'click', function() {
+
+            $(this).parent().find('input').val('');
+
+            CLOSE.ui.loadListings( null, {
+                divId: params.sidebarDivId,
+                map: true
+            });
+
+        });
+
+    }
+
+
     /**
      *
-     * @param thisData is from a form submit
      * Sends the form data to create a listing with parse and returns the object so we can do some UI stuff
      */
-    _.createListing = function( thisData ) {
+    _.initListingCreator = function() {
 
-        event.preventDefault();
+        $('.create-listing-form').on( 'submit', function(e) {
 
-        var fields = CLOSE.util.formToArray( $(thisData ) );
+            event.preventDefault();
 
-        CLOSE.parse.createListing( fields ).done(function( listing ) {
+            var $this = $(this);
 
-            // TODO: Do something here with the UI after we create a listing
-            console.log( 'created listing' );
-            console.log( listing );
+            $('#drop-pin').hide();
+            $('#confirm-position').show();
+
+            CLOSE.map.dropPinAndPosition().done(function( location ) {
+
+                var fields = CLOSE.util.formToArray( $this );
+
+                // set the location in the fields
+                fields.location = {};
+                fields.location.latitude = location.k;
+                fields.location.longitude = location.A;
+
+                // go ahead and create the lising after we are passed the done handler
+                CLOSE.parse.createListing( fields ).done(function( listing ) {
+
+                    // reload the page TODO: different solution probably
+                    window.location = '/home';
+
+                });
+
+            });
 
         });
 
@@ -135,9 +181,21 @@ CLOSE.ui = ( function( $ ) {
 
         if ( user ) {
 
+            // change some UI stuff
             $('.not-logged-in').hide();
             $('.logged-in').show();
             $('.logged-in.username').html( user.attributes.name );
+
+            // add event handlers for logging out
+            $('.log-out').on( 'click', function() {
+
+                CLOSE.parse.logout().done( function( message ) {
+                    console.log( message );
+                    CLOSE.ui.initUser();
+                });
+
+            });
+
 
         }
 
@@ -195,13 +253,13 @@ CLOSE.ui = ( function( $ ) {
         }
 
         // TODO: move??
-        var messagingFlag = false;
-        $('#messagesModal').on( 'show.bs.modal', function (e) {
-            if ( !messagingFlag ) {
-                CLOSE.messaging.initMessaging();
-                messagingFlag = true;
-            }
-        });
+//        var messagingFlag = false;
+//        $('#messagesModal').on( 'show.bs.modal', function (e) {
+//            if ( !messagingFlag ) {
+//                CLOSE.messaging.initMessaging();
+//                messagingFlag = true;
+//            }
+//        });
 
         // bind the click events
         $('a[data-toggle="sidebar"]').on( 'click', function() {
@@ -255,6 +313,94 @@ CLOSE.ui = ( function( $ ) {
 
         });
 
+        CLOSE.ui.offCanvasSlides().init();
+
+
+    };
+
+
+    /**
+     * offCanvas menu plugin
+     * let's you add, remove, and go to slides.
+     * Using deferred so each has a done method
+     * Most return the jQuery object in the done method
+     * @returns {{}}
+     */
+    _.offCanvasSlides = function() {
+
+        var $slider = $('.side-menu-wrapper'),
+            $slides = $('.side-menu-item'),
+            slideCount = $slides.length,
+            slideWidth = $slides.width(),
+            speed = 200;
+
+
+        _.init = function() {
+
+            // starting in 0 position
+            var position = 0;
+
+            $slider.attr('data-position', position )
+                   .attr('data-count', slideCount )
+                   .width( slideCount * slideWidth );
+
+        };
+
+        _.goToSlide = function( slide ) {
+
+            $slider.animate({
+                marginLeft: - ( slide - 1 ) * slideWidth + 'px'
+            }, speed );
+
+            $slider.attr('data-position', slide );
+
+        };
+
+        _.addSlide = function() {
+
+            var deferred = $.Deferred();
+
+            slideCount++;
+
+            $slider.append( '<div class="side-menu-item" />' )
+                   .attr('data-count', slideCount )
+                   .width( slideCount * slideWidth );
+
+            var $slide = $('.side-menu-item').last();
+
+            $slide.html('<h1 class="white">this is slide ' + slideCount + '</h1>');
+
+            console.log( slideCount );
+
+            CLOSE.ui.offCanvasSlides().goToSlide( slideCount );
+
+            deferred.resolve( $slide );
+
+            return deferred;
+
+        };
+
+        _.removeSlide = function() {
+
+            var deferred = $.Deferred();
+
+            slideCount--;
+
+            $slides.eq( -1 ).remove();
+
+            $slider.attr('data-position', $slider.data.position-- )
+                   .attr('data-count', slideCount )
+                   .width( slideCount * slideWidth );
+
+            CLOSE.ui.offCanvasSlides().goToSlide( slideCount );
+
+            deferred.resolve( $slides.eq( -2 ) );
+
+            return deferred;
+
+        };
+
+        return _;
 
     };
 

@@ -5,7 +5,6 @@ var render = require('../custom_modules/render.js');
 /*
  * GET home page.
  */
-// ( res, body ) - Body is data from request response data
 exports.homepage = function ( req, res ) {
 
 

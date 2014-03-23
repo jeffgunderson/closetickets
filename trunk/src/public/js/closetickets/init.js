@@ -23,33 +23,22 @@ var CLOSE = CLOSE || ( function( $ ) {
 
         // get the location first
         if ( $('#gmap').length ) {
+
             CLOSE.getLocation()
                 .done(function( coords ) {
 
-                CLOSE.map.initMap({
-                    divId: '#gmap',
-                    currentLocation: coords
-                });
-
-                $('#ticket-search').on( 'submit', function( e ) {
-                    e.preventDefault();
-                    CLOSE.ui.loadListings( this, {
-                        divId: '#sidebar-listing',
-                        map: true
-                    } );
-                });
-
-                $('#clear-filter').on( 'click', function() {
-
-                    $(this).parent().find('input').val('');
-
-                    CLOSE.ui.loadListings( null, {
-                        divId: '#sidebar-listing'
+                    CLOSE.map.initMap({
+                        divId: '#gmap',
+                        currentLocation: coords
                     });
 
-                });
+                    CLOSE.ui.initListingFiltering({
+                        searchFormId: '#ticket-search',
+                        clearDivId: '#clear-filter',
+                        sidebarDivId: '#sidebar-listing'
+                    });
 
-                $('#ticket-search').submit();
+                    CLOSE.ui.initListingCreator();
 
             });
         }
@@ -68,7 +57,7 @@ var CLOSE = CLOSE || ( function( $ ) {
         // create the deferred object
         var deferred = new $.Deferred();
 
-//        if ( !CLOSE.location && locationInProgress == false ) {
+        if ( !CLOSE.location ) {
 
             // Check if it's possible to get location
             if ( "geolocation" in navigator ) {
@@ -88,20 +77,37 @@ var CLOSE = CLOSE || ( function( $ ) {
                     // expose the location
                     CLOSE.location = coords;
 
-                    // TODO: use deferred method so this function doesn't run inside location function
-//                    CLOSE.initMapPage( coords );
-
                     deferred.resolve( coords );
+
+                }, function() {
+
+                    // if geo lookup fails, use another option. Throwing in Austin coords instead
+                    var coords = {
+                        latitude: 30.29128,
+                        longitude: -97.73858
+                    };
+
+                    // expose the location
+                    CLOSE.location = coords;
+
+                    deferred.resolve( coords )
 
                 });
 
             }
 
             else {
+                CLOSE.log('cant find the location');
                 // TODO: Use another way to find location?? IP lookup?? Not interested at the moment
             }
 
-//        }
+        }
+
+        else{
+
+            deferred.resolve( CLOSE.location );
+
+        }
 
         return deferred;
 

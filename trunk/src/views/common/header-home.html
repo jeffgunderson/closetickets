@@ -1,12 +1,18 @@
 <header class="header header-home">
     <div class="inner">
-        <span class="company-name">Closetickets</span>
+        <ul class="navigation float-left">
+            <li><a class="nav-item logged-in" data-toggle="sidebar"><i class="icon-list2 icon-big"></i></a></li>
+        </ul>
+        <div class="logo">
+            <img src="/img/logo-shield.png" alt="Closetickets logo shield">
+            <span class="company-name">Closetickets</span>
+        </div>
         <!--<img style="width:160px" src="/img/logo.png">-->
         <ul class="navigation float-right">
             <!--<li><a href="#">Features</a></li>-->
             <!--<li><a href="#">About</a></li>-->
-            <li><a class="init-signup bubble" data-target="#loginModal" data-toggle="modal">Login</a></li>
-            <li><a class="init-signup bubble" data-target="#signupModal" data-toggle="modal">Sign Up</a></li>
+            <li><a class="init-signup bubble not-logged-in" data-target="#loginModal" data-toggle="modal">Login</a></li>
+            <li><a class="init-signup bubble not-logged-in" data-target="#signupModal" data-toggle="modal">Sign Up</a></li>
         </ul>
     </div>
 </header>

@@ -2,6 +2,15 @@ CLOSE.config = CLOSE.config || ( function( $ ) {
 
     var _ = {};
 
+    _.defaultSettings = function() {
+
+        return {
+            locale: 'en_US',
+            defaultSearchRadius: 30
+        };
+
+    };
+
     _.gmapOptions = function( myLatLng ) {
 
         return {

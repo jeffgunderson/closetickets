@@ -214,6 +214,9 @@ a{
     line-height:50px;
     padding:0 15px;
 }
+.header-home .logo{
+    line-height:1em;
+}
 .header .logo img{
     width:40px;
 }
@@ -236,7 +239,7 @@ a{
 }
 .header-home .company-name{
     color:#fff;
-    font-size:22px;
+    font-size:24px;
 }
 .header-home a{
     color:#fff;
@@ -262,13 +265,40 @@ a{
     border-left:0;
     border-right:1px solid #eee;
 }
+.header-home .navigation.float-right > li > a{
+    display:block;
+    padding:10px 15px;
+}
 .navigation > li >a.nav-item:hover{
     color:#666;
 }
+.header-home .navigation > li> a.nav-item{
+    color:white;
+    line-height:2em;
+    border-right:0;
+    padding:0 5px;
+}
+
 .company-name{
     font-size: 30px;
     font-weight: normal;
     vertical-align: middle;
+}
+
+
+
+/*------------------------------------------------------------
+                      MAP PAGE
+-------------------------------------------------------------*/
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+#gmap{
+    width:100%;
+    height:100%;
+    position:absolute;
 }
 
 
@@ -280,12 +310,20 @@ a{
 #side-menu{
     width:300px;
     background:#333;
+    oveflow:hidden;
     position:fixed;
     top:0;
     left:0px;
     bottom:0;
     z-index:-1;
     box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+}
+#side-menu .side-menu-wrapper{
+    width:900px;
+}
+#side-menu .side-menu-item{
+    width:300px;
+    float:left;
 }
 #side-menu .side-menu-block{
     padding:15px 0;
@@ -327,46 +365,39 @@ a{
     background:#444;
 }
 
-
-
-
-
-
-
-/*------------------------------------------------------------
-                   MESSAGES
--------------------------------------------------------------*/
-.messages-list{
-    margin:15px 0;
+/* messsages */
+.message-list{
+    list-style-type:none;
+    margin:0;
     padding:0;
 }
-.messages-list > li{
-    border:1px solid #eee;
-    border-top:0;
-    list-style-type:none;
+.message-list li{
+    padding:15px;
+    border-bottom:2px groove #555;
 }
-.messages-list > li:first-child{
-    border-top:1px solid #eee;
+.message-list img{
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    border: 4px solid white;
+    float: left;
+    margin-right: 10px;
 }
-.message-wrapper{
-    padding:15px 0;
-    background:#fbfbfb;
-    cursor:pointer;
+.message-list h4{
+    color: white;
+    padding: 0;
+    margin: 0;
+    padding-top: 8px;
 }
-.message-wrapper img{
-    width:40px;
-    border-radius:20px;
+.message-list p{
+    font-size:13px;
+    color:#aaa;
+    margin: 0;
+    margin-top: 4px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
-.message-wrapper input[type="checkbox"] {
-    border: 1px solid #aaa;
-    -webkit-appearance: none;
-    padding: 5px;
-    margin: 0 15px;
-}
-.message-wrapper input[type="checkbox"]:checked{
-    background:#4AD150;
-}
-
 
 
 
@@ -471,7 +502,7 @@ a{
     position:absolute;
     left:0;
     bottom:0;
-    top:53px;
+    top:52px;
     z-index:105;
     overflow:auto;
 }
@@ -483,14 +514,14 @@ a{
     display:block;
     float:left;
     width:50%;
-    background:#eee;
-    color:#444;
+    background:#ccc;
+    color:#fff;
     text-align:center;
     padding:15px 0;
 }
 .sidebar .sidebar-toggle a.active{
     background:#fafafa;
-    color:#444;
+    color:#666;
 }
 .sidebar .sidebar-listing{
     list-style-type:none;
@@ -910,6 +941,9 @@ textarea{
     /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+.icon-big{
+    font-size:1.4em;
 }
 .icon-phone:before {
     content: "\e600";

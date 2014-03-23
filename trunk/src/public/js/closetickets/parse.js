@@ -116,14 +116,17 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
 
     /**
      * Simple logout API wrapper
-     * Need a better solution for what to do after logout.. maybe ;-)
+     * Using deferred here.. not necessary but using in-case I want to pass some kind of success data/message
      */
     _.logout = function() {
 
+        var deferred = new $.Deferred();
+
         Parse.User.logOut();
 
-        //TODO: FIGURE OUT WHERE TO GO
-        window.location.href = '/';
+        deferred.resolve('logged out');
+
+        return deferred;
 
     };
 
@@ -273,7 +276,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
         var userData = CLOSE.parse.userData();
 
         // get the location of the current user
-        var location = new Parse.GeoPoint({latitude: CLOSE.location.latitude, longitude: CLOSE.location.longitude });
+        var location = new Parse.GeoPoint({ latitude: fields.location.latitude, longitude: fields.location.longitude });
 
         // set all the fields for the listing
         listing.set('listingTitle', fields.name );
@@ -282,7 +285,7 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
         listing.set('price', parseFloat( fields.price ) );
         listing.set('userId', userData.id );
         listing.set('searchableText', fields.name.toLowerCase() + fields.description.toLowerCase() );
-        listing.set('location', CLOSE.location );
+        listing.set('location', fields.location );
         listing.set('locationGeoPoint', location );
 
         // save that shiz
@@ -345,6 +348,9 @@ CLOSE.parse = CLOSE.parse || ( function( $ ) {
             query.lessThan('updatedAt', new Date( fields.dateTo ) );
 
         }
+
+        // if we are looking at an area
+        query.near('locationGeoPoint', CLOSE.latlng);
 
         // return the query
         return query;
