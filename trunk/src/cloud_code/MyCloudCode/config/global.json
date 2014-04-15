@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Close Tix": {
+            "applicationId": "ENUHvNHQuOMhwYxGiZPi6c3AVORDKhfxnR1SvnY5", 
+            "masterKey": "HLdWbdW8SnojWENYzS99MTeDj4wBx2o7I9NeNL8k"
+        }, 
+        "_default": {
+            "link": "Close Tix"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.18"
+    }
+}
