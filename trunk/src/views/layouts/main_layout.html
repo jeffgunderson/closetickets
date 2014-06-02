@@ -23,19 +23,24 @@
 
     <!-- third party libs -->
     <script src="/js/vendor/modal.js"></script>
-    <script src="/js/vendor/parse-1.2.8.js"></script>
+    <script src="/js/vendor/parse-1.2.18.min.js"></script>
     <script src="/js/vendor/moment.js"></script>
     <script src="/js/vendor/mustache.js"></script>
     <script src="/js/vendor/datepicker.js"></script>
 
     <!-- custom scripts -->
     <script src="/js/closetickets/init.js"></script>
+    <script src="/js/closetickets/model.js"></script>
     <script src="/js/closetickets/config.js"></script>
     <script src="/js/closetickets/parse.js"></script>
+    <script src="/js/closetickets/user.js"></script>
+    <script src="/js/closetickets/slides.js"></script>
     <script src="/js/closetickets/ui.js"></script>
     <script src="/js/closetickets/util.js"></script>
     <script src="/js/closetickets/map.js"></script>
-    <script src="/js/closetickets/messaging.js"></script>
+    <script src="/js/closetickets/tickets.js"></script>
+    <script src="/js/closetickets/messages.js"></script>
+
 
     <!-- init -->
     <script>
@@ -63,37 +68,38 @@
 
 </head>
 <body>
-<!--[if lt IE 7]>
-<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-<![endif]-->
+<div class="body-wrapper">
+    <!--[if lt IE 7]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
 
-{{> header }}
+    {{> header }}
 
-{{{ yield }}}
+    {{{ yield }}}
 
-{{> footer }}
+    {{> footer }}
+
+    <script>
+        // Load the SDK asynchronously
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+</div>
 
 {{> tracking }}
 
 {{> modals }}
 
 {{> side-menu }}
-
-
-<script>
-    // Load the SDK asynchronously
-    (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-            return;
-        }
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "//connect.facebook.net/en_US/all.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-</script>
-
 
 </body>
 </html>
