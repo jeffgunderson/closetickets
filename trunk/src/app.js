@@ -2,11 +2,11 @@
 /**
  * Module dependencies.
  */
-var express = require('express');
+var express = require('./node_modules/express');
 var http = require('http');
 var path = require('path');
 var routes = require('./routes');
-var hogan = require('hogan-express');
+var hogan = require('./node_modules/hogan-express');
 
 // start the app
 var app = express();
