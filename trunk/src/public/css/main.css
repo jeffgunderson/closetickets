@@ -22,6 +22,11 @@ body {
     font-size: 1em;
     /*line-height: 1.4;*/
 }
+.body-wrapper{
+    position:relative;
+    z-index:2;
+    background:white;
+}
 
 /*
  * Remove text-shadow in selection highlight: h5bp.com/i
@@ -194,6 +199,9 @@ a{
     background:#EC008C;
     color:white;
 }
+.text-small{
+    font-size:14px;
+}
 
 
 /*------------------------------------------------------------
@@ -310,12 +318,12 @@ html, body {
 #side-menu{
     width:300px;
     background:#333;
-    oveflow:hidden;
+    overflow:auto;
     position:fixed;
     top:0;
     left:0px;
     bottom:0;
-    z-index:-1;
+    z-index:1;
     box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
 }
 #side-menu .side-menu-wrapper{
@@ -364,6 +372,25 @@ html, body {
 .side-menu-list > li > a:hover{
     background:#444;
 }
+.side-menu-slide-header{
+    padding: 10px 0;
+    border-bottom: 2px groove #555;
+}
+.side-menu-slide-header .inner{
+    text-align: center;
+    position: relative;
+    padding: 6px 0;
+}
+.side-menu-slide-header .button{
+    position:absolute;
+    left:10px;
+    top:2px;
+}
+.side-menu-slide-header .header-title{
+    color:white;
+    padding-left:5px;
+    font-size:19px;
+}
 
 /* messsages */
 .message-list{
@@ -372,18 +399,22 @@ html, body {
     padding:0;
 }
 .message-list li{
-    padding:15px;
     border-bottom:2px groove #555;
+}
+.message-list li a{
+    display:block;
+    padding:15px;
 }
 .message-list img{
     width: 50px;
     height: 50px;
     border-radius: 25px;
     border: 4px solid white;
-    float: left;
+    vertical-align:middle;
     margin-right: 10px;
 }
 .message-list h4{
+    display:inline;
     color: white;
     padding: 0;
     margin: 0;
@@ -578,6 +609,52 @@ html, body {
 }
 
 
+/*---------------- CONVERSATIONS ----- */
+
+.messages-list{
+    list-style-type:none;
+    margin:0;
+    padding:15px 0;
+    border-bottom:2px groove #444;
+    margin-bottom:15px;
+}
+
+.messages-list .messages-item  {
+
+}
+.messages-list .messages-item .name{
+    font-size:12px;
+    color:#ccc;
+}
+.messages-list .messages-item img{
+    width:20px;
+    border-radius:10px;
+}
+.messages-list .messages-item p{
+    font-size:14px;
+    margin: .5em 0 2em;
+    color:#fff;
+}
+.messages-list .messages-item.current-user {
+    text-align:right;
+}
+
+
+
+/*----- TICKET LIST ------ */
+.tickets-list{
+    margin:0;
+    padding:0;
+}
+.tickets-list li{
+    padding:15px 0;
+    border-bottom:2px groove #555;
+}
+.tickets-list li span{
+    color:#fff;
+}
+
+
 
 /*------------------------------------------------------------
                     LOADING GRAPHIC
@@ -635,8 +712,6 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus{
     border:1px solid #888;
     outline:0;
 }
-textarea{
-}
 .input-block{
     display:block;
     width:100%;
@@ -659,6 +734,13 @@ textarea{
     width: 30px;
     text-align: center;
 }
+textarea.dark{
+    background: #2d2d2d;
+    border-radius:5px;
+    border:0;
+    color:#ccc;
+    box-shadow:inset 0 1px 8px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.1);
+}
 
 
 /*------------------------------------------------------------
@@ -671,22 +753,74 @@ textarea{
 /*.gm-style .gm-style-iw, .gm-style .gm-style-iw a, .gm-style .gm-style-iw span, .gm-style .gm-style-iw label, .gm-style .gm-style-iw div {*/
     /*font-weight:normal !important;*/
 /*}*/
+.gm-style-iw{
+    width:100% !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    font-weight: 300;
+    font-size: 13px;
+    background: white;
+    height:auto !important;
+}
 .pin-wrapper{
-    padding:15px;
-    width:300px;
-    min-height:120px;
+    font-weight:normal;
+    font-size:14px !important;
+    min-height:50px !important;
     font-family: 'Proxima Nova', 'Proxima Nova Web', 'helvetica neue', helvetica, arial, sans-serif;
 }
 .pin-wrapper div.name{
-    font-size:16px;
+    margin-top:30px;
+    text-align:center;
+    font-size:22px;
     font-family: 'Proxima Nova', 'Proxima Nova Web', 'helvetica neue', helvetica, arial, sans-serif;
     font-weight:bold;
 }
 .pin-wrapper a.button{
-    font-size:16px;
+    font-size:14px;
     font-weight:normal;
 }
-
+.pin-wrapper .price{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+.pin-wrapper .pin-details{
+    font-size:14px;
+    color:#888;
+    margin-bottom:10px;
+    /*font-weight:normal;*/
+}
+.pin-wrapper .pin-header{
+    padding:5px 10px;
+    border-bottom:1px solid #eee;
+    background:#fafafa;
+}
+.pin-wrapper .pin-footer{
+    padding:0 15px;
+    border-top:1px solid #eee;
+}
+.pin-wrapper .pin-footer img{
+    width: 40px;
+    border-radius: 20px;
+    border: 2px solid #eee;
+}
+.pin-wrapper .pin-footer .user-name{
+    font-size:16px;
+}
+.pin-wrapper .pin-footer .by-user, .pin-wrapper .pin-footer .pin-actions{
+    margin-top:13px;
+    /*font-weight:normal;*/
+}
+.pin-wrapper .pin-body{
+    text-align:center;
+}
+.pin-wrapper .pin-body .description{
+    font-weight:normal;
+    margin:2em 0;
+    color:#777;
+}
 
 
 
@@ -753,8 +887,25 @@ textarea{
     padding:8px 14px;
     font-size:16px;
 }
+.button-close{
+    width:26px;
+    height:26px;
+    padding:0;
+    margin:0;
+    line-height:26px;
+    border-radius:13px;
+    text-align:center;
+    position:relative;
+    top:-5px;
+}
+.button-close i{
+    padding:0;
+    margin:0;
+    font-size:0.8em;
+}
 .button-block{
     display:block;
+    width:100%;
     text-align:center;
 }
 .button:hover{
@@ -854,6 +1005,15 @@ textarea{
 .white{
     color:#fff !important;
 }
+
+
+.background-blue{
+    background:#0cb2f9;
+}
+.background-green{
+    background:#4AD150;
+}
+
 @font-face {
     font-family: 'icons';
     src: url('/fonts/entypo.eot.eot?') format('eot'),
