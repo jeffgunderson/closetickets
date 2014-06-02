@@ -1,0 +1,16 @@
+<div class="side-menu-slide-header background-blue">
+    <div class="inner">
+        <a class="button button-small button-blue" data-action="removeSlide"><i class="icon-reply"></i></a>
+        <span class="header-title"><i class="icon-mail"></i> Messages</span>
+    </div>
+</div>
+<ul class="message-list">
+    {{#results}}
+        <li class="clearfix">
+            <a data-load="messages" data-id="{{conversationId}}" data-touserid="{{userId}}" data-touseridclean="{{userIdClean}}">
+                <img src="{{profileImage}}">
+                <h4>{{name}}</h4>
+            </a>
+        </li>
+    {{/results}}
+</ul>

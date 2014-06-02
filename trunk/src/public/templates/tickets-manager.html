@@ -1,0 +1,23 @@
+<div class="side-menu-slide-header background-green">
+    <div class="inner">
+        <a class="button button-small button-green" data-action="removeSlide"><i class="icon-reply"></i></a>
+        <span class="header-title"><i class="icon-browser"></i> Manage Tickets</span>
+    </div>
+</div>
+<ul class="tickets-list">
+    {{#results}}
+        <li>
+            <div class="inner clearfix">
+                <span>{{attributes.title}}</span>
+                <a data-id="{{id}}" data-action="deleteticket" class="float-right button button-close button-red"><i class="icon-cross"></i></a>
+            </div>
+
+        </li>
+    {{/results}}
+    {{^results}}
+        <li>
+            <br>
+            <span class="centered">You do not have any tickets to manage</span>
+        </li>
+    {{/results}}
+</ul>

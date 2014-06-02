@@ -1,0 +1,47 @@
+<div class="side-menu-slide-header background-blue">
+    <div class="inner">
+        <a class="button button-small button-blue" data-action="removeSlide"><i class="icon-reply"></i></a>
+        <span class="header-title"><i class="icon-users"></i> Conversation</span>
+    </div>
+</div>
+<ul class="messages-list">
+    {{#results}}
+        <li>
+            <div class="inner">
+                {{#attributes.currentUser}}
+                <div class="messages-item current-user">
+                    <span class="name">{{attributes.userPointer.attributes.name}}</span>
+                    <img src="{{attributes.userPointer.attributes.profileImage}}">
+                    <br>
+                    <p>{{attributes.text}}</p>
+                </div>
+                {{/attributes.currentUser}}
+                {{^attributes.currentUser}}
+                <div class="messages-item">
+                    <img src="{{attributes.userPointer.attributes.profileImage}}">
+                    <span class="name">{{attributes.userPointer.attributes.name}}</span>
+                    <br>
+                    <p>{{attributes.text}}</p>
+                </div>
+                {{/attributes.currentUser}}
+
+            </div>
+        </li>
+    {{/results}}
+    {{^results}}
+        <br>
+        <span class="centered">This conversation is empty</span>
+    {{/results}}
+</ul>
+
+<div class="messages-form">
+    <div class="inner">
+        <form data-action="message" data-id="{{conversationId}}">
+            <input type="hidden" name="userid" value={{toUserId}}>
+            <input type="hidden" name="useridclean" value="{{toUserIdClean}}">
+            <textarea class="dark input-block text-small" rows="4" name="message" placeholder="Type your message here..."></textarea>
+            <button type="submit" class="button button-small button-green button-block"><i class="icon-checkmark"></i> Send Message</button>
+        </form>
+    </div>
+
+</div>

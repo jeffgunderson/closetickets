@@ -1,11 +1,37 @@
 <div class="pin-wrapper">
-    <div class="name">{{attributes.listingTitle}}</div>
-    <!--<div class="date"><i class="icon">&#128340;</i> January 4 @ 8:30pm</div>-->
-    <!--<div class="proximity"><i class="icon">&#59172;</i> {{attributes.locationDistanceFromText}}</div>-->
-    <!--<div class="price green">${{attributes.price}}</div>-->
-    <p class="description">{{attributes.listingDescription}}</p>
-    <div class="button-group">
-        <a class="button button-pink"><i class="icon-mail"></i> Message</a>
-        <a class="button button-pink"><i class="icon-checkmark"></i>Save</a>
+
+    <div class="pin-body">
+        <div class="inner">
+            <div class="name">{{attributes.title}}</div>
+            <div class="price green">${{attributes.price}}</div>
+            <p class="description">{{attributes.description}}</p>
+            <div class="pin-details clearfix">
+                <div class="float-left">
+                    <span class="date"><i class="icon-clock">&#128340;</i> January 4 @ 8:30pm</span>
+                </div>
+                <div class="float-right">
+                    <span class="proximity"><i class="icon-location">&#59172;</i> {{attributes.locationDistanceFromText}}</span>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <div class="pin-footer clearfix">
+
+        {{^currentUser}}
+        <div class="pin-actions float-right">
+            <a class="button button-green"
+               data-toggle="inbox"
+               data-userid="{{attributes.userPointer.attributes.userId}}"
+               data-useridclean="{{attributes.userPointer.id}}"><i class="icon-mail"></i> Message</a>
+        </div>
+        {{/currentUser}}
+
+        <div class="by-user float-left">
+            <img src="{{attributes.userPointer.attributes.profileImage}}">
+            <span class="user-name">{{attributes.userPointer.attributes.name}}</span>
+        </div>
+    </div>
+
 </div>
