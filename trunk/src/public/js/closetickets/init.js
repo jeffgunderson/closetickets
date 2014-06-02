@@ -9,49 +9,18 @@ var CLOSE = CLOSE || ( function( $ ) {
     _.init = function() {
         Parse.initialize("ENUHvNHQuOMhwYxGiZPi6c3AVORDKhfxnR1SvnY5", "1cogFRDdTx1yH1x73irClLWNPRduSAdpNJY1KIsY")
 //        CLOSE.getLocation();
-        CLOSE.initMapPage();
+        CLOSE.ui.initMapPage();
         CLOSE.ui.initUser();
         CLOSE.ui.initSidebar();
         CLOSE.ui.initLogin();
     };
 
-    /**
-     *
-     * loads the map and binds the search events
-     */
-    _.initMapPage = function() {
-
-        // get the location first
-        if ( $('#gmap').length ) {
-
-            CLOSE.getLocation()
-                .done(function( coords ) {
-
-                    CLOSE.map.initMap({
-                        divId: '#gmap',
-                        currentLocation: coords
-                    });
-
-                    CLOSE.ui.initListingFiltering({
-                        searchFormId: '#ticket-search',
-                        clearDivId: '#clear-filter',
-                        sidebarDivId: '#sidebar-listing'
-                    });
-
-                    CLOSE.ui.initListingCreator();
-
-            });
-        }
-
-    };
-
-
 
     /**
      * Uses HTML5 location to figure location
      * MOST accurate using phone/tablet with GPS, desktop/laptop not so accurate
+     * TODO: move to location module
      */
-//    var locationInProgress = false;
     _.getLocation = function() {
 
         // create the deferred object
@@ -81,7 +50,7 @@ var CLOSE = CLOSE || ( function( $ ) {
 
                 }, function() {
 
-                    // if geo lookup fails, use another option. Throwing in Austin coords instead
+                    // if geo lookup fails, use another option. Throwing in Austin coords for now.
                     var coords = {
                         latitude: 30.29128,
                         longitude: -97.73858
@@ -98,7 +67,17 @@ var CLOSE = CLOSE || ( function( $ ) {
 
             else {
                 CLOSE.log('cant find the location');
-                // TODO: Use another way to find location?? IP lookup?? Not interested at the moment
+                // TODO: Use another way to find location?? IP lookup?? Not interested at the moment so using Austin coords
+                var coords = {
+                    latitude: 30.29128,
+                    longitude: -97.73858
+                };
+
+                // expose the location
+                CLOSE.location = coords;
+
+                deferred.resolve( coords )
+
             }
 
         }

@@ -54,6 +54,33 @@ CLOSE.map = ( function( $ ) {
 
     };
 
+
+    /**
+     *
+     * @param pinId is the DB ID of the ticket
+     * TODO: maybe return true and put the UI part somewhere else
+     */
+    _.removePin = function( pinId ) {
+
+        if ( markersArray ) {
+
+            for( i in markersArray) {
+                if ( markersArray[i].pinId == pinId ) {
+                    markersArray[i].setMap(null);
+                    markersArray.length--;
+                    markerIds.length--;
+
+                    // kinda hackish
+                    $('.sidebar-listing a[data-pinid="' + pinId + '"]' ).closest('li' ).remove();
+
+                }
+            }
+
+        }
+
+    };
+
+
     /**
      *
      * @param listings is an object containing ticket listings
@@ -61,11 +88,10 @@ CLOSE.map = ( function( $ ) {
      */
     _.initPins = function( listings ) {
 
+        // clear the map first of any other pins
         if ( markersArray.length ) {
             CLOSE.map.removePins();
         }
-
-
 
         // get the template
         CLOSE.util.getTemplate('pin-window').done( function( template ) {
@@ -75,7 +101,7 @@ CLOSE.map = ( function( $ ) {
             // If we want more than 1 open at a time, we need to create it inside the loop and inside the click event
             var infowindow = new google.maps.InfoWindow({
                 content: '',
-                maxWidth: 400
+                maxWidth: 380
             });
 
             // loop over the listings
@@ -94,7 +120,8 @@ CLOSE.map = ( function( $ ) {
 
                 checkMarker = function() {
 
-                    if ( inArray === -1) {
+                    // if it's not already in array
+                    if ( inArray === -1 ) {
 
                         // create the pin marker
                         var marker = new google.maps.Marker({
@@ -116,20 +143,22 @@ CLOSE.map = ( function( $ ) {
                         // push the marker to the markers object
                         markersArray.push(marker);
 
-                        CLOSE.log('This is not in the array');
-                        CLOSE.log( 'The Array after being pushed is:');
+//                        CLOSE.log('This is not in the array');
+//                        CLOSE.log( 'The Array after being pushed is:');
                         CLOSE.log( markersArray );
-
-                        // return the marker so we can add event listeners, etc
-                        return marker;
 
                     }
 
                     else{
-                        CLOSE.log( listings.results[i].id + ' is in this array');
-                        CLOSE.log( 'The Array is:');
-                        CLOSE.log( markersArray );
+//                        CLOSE.log( listings.results[i].id + ' is in this array');
+//                        CLOSE.log( 'The Array is:');
+//                        CLOSE.log( markersArray );
+                        return false;
+
                     }
+
+                    // return the marker so we can add event listeners, etc
+                    return marker;
                 };
 
                 var marker = checkMarker();
@@ -139,10 +168,19 @@ CLOSE.map = ( function( $ ) {
                     // add event listeners for the clicks
                     google.maps.event.addListener(marker, 'click', (function(marker, i ) {
                         return function() {
+
+                            CLOSE.log( marker.closeData );
+
+                            if ( marker.closeData.attributes.userPointer.id == CLOSE.user.currentUser().attributes.cleanId ) {
+                                marker.closeData.currentUser = true;
+                            }
+
                             infowindow.setContent( Mustache.render( template, marker.closeData ) );
                             infowindow.open( CLOSE.gmap, marker);
                             CLOSE.gmap.panTo( marker.position );
                             CLOSE.gmap.panBy( 0 , -70 );
+                            CLOSE.map.bindPinMessaging();
+
                         }
                     })(marker, i));
 
@@ -154,27 +192,62 @@ CLOSE.map = ( function( $ ) {
 
                             if ( pinId == marker.closeData.id ) {
 
+                                if ( marker.closeData.attributes.userPointer.id == CLOSE.user.currentUser().attributes.cleanId ) {
+                                    marker.closeData.currentUser = true;
+                                }
+
                                 infowindow.setContent( Mustache.render( template, marker.closeData ) );
                                 infowindow.open( CLOSE.gmap, marker );
+
                                 CLOSE.gmap.panTo( marker.position );
                                 CLOSE.gmap.panBy( 0 , -70 );
+                                CLOSE.map.bindPinMessaging();
 
                             }
                         }
                     })(marker, i));
 
-//                google.maps.event.addListener( infowindow, 'domready', hackClose );
+//                    google.maps.event.addListener( infowindow, 'domready', hackClose );
 //
-//                function hackClose() {
-//                    $('.gm-style-iw').css('left', function() {
-//                        return ( $(this).parent().width() - $(this).width()) / 2;
-//                    }).next('div').remove();
-//                }
+//                    function hackClose() {
+//                        $('.gm-style-iw').css('left', function() {
+//                            return ( $(this).parent().width() - $(this).width()) / 2;
+//                        }).next('div').remove();
+//                    }
 
                 }
 
 
             }
+
+        });
+
+    };
+
+
+    _.bindPinMessaging = function() {
+
+        $( '[data-toggle="inbox"]' ).on('click', function() {
+
+            var $this = $( this ),
+                toUserId = $this.attr('data-userid' ),
+                toUserIdClean = $this.attr('data-useridclean');
+
+            CLOSE.messages.checkConversation( toUserIdClean )
+                .done(function( conversation ) {
+
+                    CLOSE.ui.loadMessages( conversation[0].id, toUserId, toUserIdClean );
+
+                })
+                .fail(function() {
+
+                    CLOSE.messages.createConversation( toUserId, toUserIdClean ).done(function( conversation ) {
+
+                        CLOSE.ui.loadMessages( conversation.id, toUserId, toUserIdClean );
+
+                    })
+
+                });
 
         });
 
@@ -203,6 +276,8 @@ CLOSE.map = ( function( $ ) {
                 icon: '/img/map/pin.png',
                 draggable: true
             });
+
+            CLOSE.gmap.panTo( pinLocation );
 
             google.maps.event.addListener( marker, 'dragend', function() {
 

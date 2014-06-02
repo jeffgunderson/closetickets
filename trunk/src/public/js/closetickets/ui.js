@@ -5,6 +5,7 @@ CLOSE.ui = ( function( $ ) {
     /**
      * Creating a user from form fields
      * @thisData object is required (from a form submit)
+     * TODO: bind the form submit in here instead
      */
     _.createUser = function( thisData ) {
 
@@ -13,13 +14,49 @@ CLOSE.ui = ( function( $ ) {
         var $form = $( thisData ),
             fields = CLOSE.util.formToArray( $form );
 
-        CLOSE.parse.createNewUser( fields )
+        console.log( 'fields:');
+        console.log( fields );
+
+        CLOSE.user.createNewUser( fields )
             .done( function( user ) {
                 //TODO: do something
+//                window.location = '/home'
+
+                CLOSE.parse.loginUser( fields )
+                    .done(function() {
+
+                        // TODO: make /home the homepage maybe??
+                        if ( window.location.pathname == '/') {
+                            console.log('at homepage');
+                            window.location = '/home';
+                        }
+
+                        $('#signupModal').modal('hide');
+
+                        CLOSE.ui.initUser();
+
+                })
+
             })
             .fail( function( user, error ) {
                 //TODO: do something with the error
             });
+
+    };
+
+
+    /**
+     * UI side of creating an FB user.. still need to finish data part
+     * TODO: do something after creating the user
+     * TODO: make it on a form submit, button click, etc
+     */
+    _.createFbUser = function() {
+
+        CLOSE.parse.createNewFbUser()
+            .done(function() {
+                console.log('created');
+            });
+
     };
 
     /**
@@ -34,17 +71,18 @@ CLOSE.ui = ( function( $ ) {
             var $form = $( this ),
                 fields = CLOSE.util.formToArray( $form );
 
-            CLOSE.parse.loginUser( fields ).done(function() {
+            CLOSE.user.loginUser( fields )
+                .done(function() {
 
-                // TODO: make /home the homepage maybe??
-                if ( window.location.pathname == '/') {
-                    console.log('at homepage');
-                    window.location = '/home';
-                }
+                    // TODO: make /home the homepage maybe??
+                    if ( window.location.pathname == '/') {
+                        console.log('at homepage');
+                        window.location = '/home';
+                    }
 
-                $('#loginModal').modal('hide');
+                    $('#loginModal').modal('hide');
 
-                CLOSE.ui.initUser();
+                    CLOSE.ui.initUser();
 
             });
 
@@ -54,15 +92,35 @@ CLOSE.ui = ( function( $ ) {
 
     };
 
-    /**
-     * UI side of creating an FB user
-     * TODO: do something after creating the user
-     */
-    _.createFbUser = function() {
 
-        CLOSE.parse.createNewFbUser().done(function() {
-            console.log('created');
-        });
+    /**
+     *
+     * loads the map and binds the search events
+     */
+    _.initMapPage = function() {
+
+        // if we even need to load the map
+        if ( $('#gmap').length ) {
+
+            // get the location first
+            CLOSE.getLocation()
+                .done(function( coords ) {
+
+                    CLOSE.map.initMap({
+                        divId: '#gmap',
+                        currentLocation: coords
+                    });
+
+                    CLOSE.ui.initListingFiltering({
+                        searchFormId: '#ticket-search',
+                        clearDivId: '#clear-filter',
+                        sidebarDivId: '#sidebar-listing'
+                    });
+
+                    CLOSE.ui.initListingCreator();
+
+                });
+        }
 
     };
 
@@ -75,16 +133,18 @@ CLOSE.ui = ( function( $ ) {
      */
     _.loadListings = function( thisData, options ) {
 
-        var query = CLOSE.parse.createListingQuery( thisData );
+        var query = CLOSE.tickets.createListingQuery( thisData );
 
-        CLOSE.parse.queryListings( query ).done(function( listings ) {
+        CLOSE.tickets.queryTickets( query ).done(function( listings ) {
 
             CLOSE.util.getTemplate( 'sidebar-listing' ).done( function( template ) {
+
+                CLOSE.log( listings );
 
                 // add some needed location info ( miles away, etc )
                 var newListings = CLOSE.util.locationUtil( listings );
 
-                var html = Mustache.render( template, newListings );
+                var html = CLOSE.util.mergeMustacheData( template, newListings );
 
                 $( options.divId ).html( html );
 
@@ -158,9 +218,10 @@ CLOSE.ui = ( function( $ ) {
                 fields.location.longitude = location.A;
 
                 // go ahead and create the lising after we are passed the done handler
-                CLOSE.parse.createListing( fields ).done(function( listing ) {
+                CLOSE.tickets.createTicket( fields ).done(function( listing ) {
 
-                    // reload the page TODO: different solution probably
+                    // reload the page
+                    // TODO: update UI without reloading
                     window.location = '/home';
 
                 });
@@ -177,7 +238,7 @@ CLOSE.ui = ( function( $ ) {
      */
     _.initUser = function() {
 
-        var user = CLOSE.parse.currentUser();
+        var user = CLOSE.user.currentUser();
 
         if ( user ) {
 
@@ -189,13 +250,13 @@ CLOSE.ui = ( function( $ ) {
             // add event handlers for logging out
             $('.log-out').on( 'click', function() {
 
-                CLOSE.parse.logout().done( function( message ) {
+                CLOSE.user.logout().done( function( message ) {
                     console.log( message );
-                    CLOSE.ui.initUser();
+//                    CLOSE.ui.initUser();
+                    window.location = '/'
                 });
 
             });
-
 
         }
 
@@ -244,54 +305,97 @@ CLOSE.ui = ( function( $ ) {
      */
     _.initSidebar = function() {
 
-        var $body = $('body');
+        var $bodyWrapper = $('.body-wrapper');
 
         // first need to create the empty div that is needed to cover the other half of the screen
         // only do this once so we don't have duplicates so check to see if it exists first
         if ( !$('#page-cover').length ) {
-            $body.append('<a data-toggle="sidebar" id="page-cover" style="display:none"></a>');
+            $bodyWrapper.append('<a data-toggle="sidebar" id="page-cover" style="display:none"></a>');
         }
 
-        // TODO: move??
-//        var messagingFlag = false;
-//        $('#messagesModal').on( 'show.bs.modal', function (e) {
-//            if ( !messagingFlag ) {
-//                CLOSE.messaging.initMessaging();
-//                messagingFlag = true;
-//            }
-//        });
+        // make sure body wrapper has a min height of the window
+        $bodyWrapper.css({
+            minHeight: $(window).height()
+        });
+
+        // and during resize
+        $(window).resize(function() {
+            $bodyWrapper.css({
+                minHeight: $(window).height()
+            });
+        });
+
+        CLOSE.slides.init();
+
+        $('a[data-action="messaging"]').on( 'click', function() {
+            CLOSE.ui.initMessaging();
+        });
+
+        $('a[data-action="ticketmanager"]' ).on( 'click', function() {
+            CLOSE.ui.initTicketManager();
+        });
 
         // bind the click events
         $('a[data-toggle="sidebar"]').on( 'click', function() {
+            toggleSidebar();
+        });
 
-            var activeClass = 'active',
+        // this should be done some other way
+        if ( CLOSE.user.currentUser() ) {
+
+            $('.logged-in.avatar' ).attr('src', CLOSE.user.currentUser().attributes.profileImage );
+            $('.logged-in.username' ).html( CLOSE.user.currentUser().attributes.name );
+
+        }
+
+
+        var toggleSidebar = function() {
+
+            var activeClass = 'active-sidebar',
                 sidebarWidth = 300,
                 $cover = $('#page-cover');
 
             // set some CSS on the body so it can be moved
-            $body.css({ position: 'relative' });
+            $bodyWrapper.css({ position: 'relative' });
 
             // check to make sure the menu isn't already exposed
-            if ( !$body.hasClass(activeClass) ) {
+            if ( !$bodyWrapper.hasClass(activeClass) ) {
 
-                // show the cover and add some CSS to it
-                $cover.show().css({
-                    display: 'block',
-                    position: 'fixed',
-                    zIndex: '120',
-                    left: sidebarWidth + 'px',
-                    top:0,
-                    right:0,
-                    bottom:0
-                });
 
                 // animate the body to expose the menu
-                $body.animate({
+                $bodyWrapper.animate({
+                    position: 'relative',
                     left: sidebarWidth
-                }, 100 );
+                }, 100, function() {
+
+                    // show the cover and add some CSS to it
+                    $cover.show().css({
+                        display: 'block',
+                        position: 'fixed',
+                        zIndex: '120',
+                        left: sidebarWidth + 'px',
+                        top:0,
+                        right:0,
+                        bottom:0
+                    });
+
+                } );
 
                 // add the active class so we know that it's open
-                $body.addClass(activeClass);
+                $bodyWrapper.addClass(activeClass);
+
+                $bodyWrapper.css({
+                    width:'100%',
+                    overflow: 'hidden'
+                });
+
+                $('body').css({
+                    position: 'fixed',
+                    top:0,
+                    bottom:0,
+                    width: '100%',
+                    overflow: 'hidden'
+                });
 
             }
 
@@ -302,107 +406,214 @@ CLOSE.ui = ( function( $ ) {
                 $cover.hide();
 
                 // animate the body back to normal position
-                $body.animate({
+                $bodyWrapper.animate({
                     left: 0
-                }, 100 );
+                }, 100, function() {
 
-                // remove the active class so we know it's closed
-                $body.removeClass(activeClass);
+                    // remove the active class so we know it's closed
+                    $bodyWrapper.removeClass(activeClass);
+
+                    $bodyWrapper
+                        .attr('style','')
+                        .css({
+                            minHeight: $(window).height()
+                    });
+
+                    $('body').attr('style','');
+
+                } );
+
+
 
             }
 
-        });
 
-        CLOSE.ui.offCanvasSlides().init();
+        };
+
+        _.initMessaging = function() {
+
+            if ( CLOSE.user.currentUser() ) {
+
+                CLOSE.slides.addSlide().done(function( $div ) {
+
+                    CLOSE.messages.queryConversations().done(function( conversations ) {
+
+                        CLOSE.util.getTemplate('inbox-conversations').done(function( template ) {
+
+                            var conversationData = CLOSE.util.prepareConversationData( conversations );
+
+                            $div.html( CLOSE.util.mergeMustacheData( template, { results: conversationData } ) );
+
+                            $('[data-load="messages"]').on( 'click' , function() {
+
+                                var $thisData = $( this ).data();
+
+                                // TODO: use data().id but I think i was having issues
+                                CLOSE.ui.loadMessages( $( this ).attr('data-id'), $thisData.touserid, $thisData.touseridclean );
+
+                            });
+
+                        });
+
+                    });
+
+                });
+
+            }
+
+        };
+
+
+        // TODO: rename to something more specific
+        _.loadMessages = function( conversationId, toUserId, toUserIdClean ) {
+
+            if ( CLOSE.user.currentUser() ) {
+
+                CLOSE.slides.addSlide().done(function( $div ) {
+
+                    CLOSE.messages.queryMessages( conversationId ).done(function( messages ) {
+
+                        CLOSE.log( messages );
+
+                        // some more massaging
+                        // setting the current user in the message result
+                        // TODO: move somewhere else
+                        for ( i = 0; i < messages.length; i++ ) {
+
+                            if ( messages[i].attributes.userPointer.id == CLOSE.user.currentUser().attributes.cleanId ) {
+
+                                messages[i].attributes.currentUser = true;
+
+                            }
+
+                        }
+
+                        // reversing the array so the newest message is last
+                        // doing it for view purposes of having the latest message at the bottom of screen like text messaging
+                        messages.reverse();
+
+                        var templateData = {
+                            results: messages,
+                            conversationId: conversationId,
+                            toUserId: toUserId,
+                            toUserIdClean: toUserIdClean
+                        };
+
+                        CLOSE.util.getTemplate('inbox-messages').done(function( template ) {
+
+                            $div.html( CLOSE.util.mergeMustacheData( template, templateData ) );
+
+                            CLOSE.ui.bindAddMessage( $div, messages, templateData );
+                            // ^^ hmm... not sure about this way or if anything should get passed in
+//                            CLOSE.ui.bindAddMessage({
+//                                div: $div,
+//                                messages: messages,
+//                                templateData: templateData
+//                            });
+
+                        })
+
+
+                    });
+
+                });
+
+            }
+
+        };
+
+
+        _.bindAddMessage = function( $div, messages, templateData  ) {
+
+            /**
+             * Binding the adding message form here
+             */
+            $('[data-action="message"]').on('submit', function( e ) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                var fields = CLOSE.util.formToArray( $(this) );
+
+                CLOSE.messages.addMessage( fields.userid, fields.useridclean, fields.message ).done(function( savedMessage ) {
+
+                    // ugh this sucks but parse does not include pointer data after a save
+                    savedMessage.attributes.userPointer.attributes.name = CLOSE.user.currentUser().attributes.name;
+                    savedMessage.attributes.userPointer.attributes.profileImage = CLOSE.user.currentUser().attributes.profileImage;
+                    savedMessage.attributes.currentUser = true;
+
+                    // pushing saved message to array so we can update view but not send another API request
+                    messages.push( savedMessage );
+
+                    // mustache the data
+                    CLOSE.util.getTemplate('inbox-messages').done(function( template ) {
+
+                        $div.html( CLOSE.util.mergeMustacheData( template, templateData ) );
+
+                    });
+
+                });
+
+            });
+
+        };
+
+
 
 
     };
 
 
-    /**
-     * offCanvas menu plugin
-     * let's you add, remove, and go to slides.
-     * Using deferred so each has a done method
-     * Most return the jQuery object in the done method
-     * @returns {{}}
-     */
-    _.offCanvasSlides = function() {
 
-        var $slider = $('.side-menu-wrapper'),
-            $slides = $('.side-menu-item'),
-            slideCount = $slides.length,
-            slideWidth = $slides.width(),
-            speed = 200;
+    _.initTicketManager = function() {
 
+        if ( CLOSE.user.currentUser() ) {
 
-        _.init = function() {
+            CLOSE.slides.addSlide().done(function( $div ) {
 
-            // starting in 0 position
-            var position = 0;
+                //TODO: query the tickets
 
-            $slider.attr('data-position', position )
-                   .attr('data-count', slideCount )
-                   .width( slideCount * slideWidth );
+                CLOSE.tickets.queryUserTickets().done(function( tickets ) {
 
-        };
+                    CLOSE.util.getTemplate('tickets-manager' ).done(function( template ) {
 
-        _.goToSlide = function( slide ) {
+                        var templateData = {
+                            results: tickets
+                        };
 
-            $slider.animate({
-                marginLeft: - ( slide - 1 ) * slideWidth + 'px'
-            }, speed );
+                        $div.html( CLOSE.util.mergeMustacheData( template, templateData ) );
 
-            $slider.attr('data-position', slide );
+                        $( 'body' ).on( 'click', '[data-action="deleteticket"]', function() {
 
-        };
+                            var $this = $(this ),
+                                ticketId = $this.attr('data-id');
 
-        _.addSlide = function() {
+                            CLOSE.tickets.deleteTicket( ticketId ).done(function() {
 
-            var deferred = $.Deferred();
+                                $this.closest( 'li' ).remove();
 
-            slideCount++;
+                                if ( $('#gmap').length ) {
 
-            $slider.append( '<div class="side-menu-item" />' )
-                   .attr('data-count', slideCount )
-                   .width( slideCount * slideWidth );
+                                    CLOSE.map.removePin( ticketId );
 
-            var $slide = $('.side-menu-item').last();
+                                }
 
-            $slide.html('<h1 class="white">this is slide ' + slideCount + '</h1>');
+                            });
 
-            console.log( slideCount );
+                        });
 
-            CLOSE.ui.offCanvasSlides().goToSlide( slideCount );
+                    });
 
-            deferred.resolve( $slide );
+                });
 
-            return deferred;
+            });
 
-        };
-
-        _.removeSlide = function() {
-
-            var deferred = $.Deferred();
-
-            slideCount--;
-
-            $slides.eq( -1 ).remove();
-
-            $slider.attr('data-position', $slider.data.position-- )
-                   .attr('data-count', slideCount )
-                   .width( slideCount * slideWidth );
-
-            CLOSE.ui.offCanvasSlides().goToSlide( slideCount );
-
-            deferred.resolve( $slides.eq( -2 ) );
-
-            return deferred;
-
-        };
-
-        return _;
+        }
 
     };
+
+
+
 
 
 

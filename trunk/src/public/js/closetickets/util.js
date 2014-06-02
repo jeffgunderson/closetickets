@@ -3,6 +3,17 @@ CLOSE.util = CLOSE.util || ( function( $ ) {
     var _ = {};
 
     /**
+     * Merges data with a mustache template
+     * @template {string} contains template in html form
+     * @data {object} data to be merged into template
+     */
+    _.mergeMustacheData = function( template, data ) {
+
+        return Mustache.render( template , data );
+    };
+
+
+    /**
      * Normalizing parse result data function
      * converts an anonymous array to an array wrapped with 'results'...
      * makes it easier to use when using templates
@@ -181,6 +192,47 @@ CLOSE.util = CLOSE.util || ( function( $ ) {
         }
 
         return listings;
+
+    };
+
+    /**
+     * Strips out current user data so doing view is easier with recipient info
+     * Inserts the conversation ID for querying messages by conversation ID as well
+     * @returns {Array}
+     */
+    _.prepareConversationData = function( conversations ) {
+
+        var conversationArray = [];
+
+        for ( i = 0; i < conversations.results.length; i++ ) {
+
+            // there isn't much data in conversations. We really just need the user information.
+            // We will need the conversation ID as well
+            var users = conversations.results[i].attributes.users;
+
+            // loop over each of them
+            for ( j = 0; j < users.length; j++ ) {
+
+                // if it's not the current user, we will go ahead (we just need the other user info)
+                if ( users[j].id != CLOSE.user.currentUser().attributes.cleanId ) {
+
+                    // need the conversation ID for querying messages by conversation ID
+                    users[j].attributes.conversationId = conversations.results[i].id;
+
+                    // we also want to include the user clean ID
+                    users[j].attributes.userIdClean = users[j].id;
+
+                    // pushing it to the array
+                    conversationArray.push(users[j].attributes);
+
+                }
+
+            }
+
+        }
+
+        // return the array
+        return conversationArray;
 
     };
 
